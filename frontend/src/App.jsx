@@ -22,6 +22,7 @@ import Profile from './pages/Profile'
 import AdminDashboard from './admin/AdminDashboard'
 import AdminResources from './admin/AdminResources'
 import AdminEducation from './admin/AdminEducation'
+import AdminUsers from './admin/AdminUsers'
 
 import OrgDashboard from './organization/OrgDashboard'
 import OrgResources from './organization/OrgResources'
@@ -68,6 +69,9 @@ export default function App() {
             <RoleRoute roles={['ADMIN']}><AdminDashboard /></RoleRoute>
           } />
           <Route path="/admin/users" element={
+            <RoleRoute roles={['ADMIN']}><AdminUsers /></RoleRoute>
+          } />
+          <Route path="/admin/resources" element={
             <RoleRoute roles={['ADMIN']}><AdminResources /></RoleRoute>
           } />
           <Route path="/admin/education" element={

@@ -32,7 +32,10 @@ export const register = async (req, res) => {
     }
 
     const allowedRoles = ['CITIZEN', 'ORGANIZATION'];
-    const userRole = allowedRoles.includes(role) ? role : 'CITIZEN';
+    const isAdminCreating = req.user?.role === 'ADMIN';
+    const userRole = isAdminCreating && ['CITIZEN', 'ORGANIZATION', 'ADMIN'].includes(role)
+      ? role
+      : allowedRoles.includes(role) ? role : 'CITIZEN';
 
     const user = await User.create({ name, email, password, role: userRole });
 
@@ -85,6 +88,42 @@ export const login = async (req, res) => {
 export const logout = async (req, res) => {
   res.cookie('token', '', { httpOnly: true, expires: new Date(0) });
   res.json({ success: true, message: 'Logged out' });
+};
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const { search } = req.query;
+    let filter = {};
+    if (search) {
+      const regex = new RegExp(search, 'i');
+      filter.$or = [
+        { name: regex },
+        { email: regex },
+        { role: regex },
+      ];
+    }
+    const users = await User.find(filter).select('-password').sort({ createdAt: -1 });
+    res.json({
+      success: true,
+      data: {
+        users: users.map(u => ({ id: u._id, name: u.name, email: u.email, role: u.role, createdAt: u.createdAt })),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to get users' });
+  }
+};
+
+export const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    res.json({ success: true, message: 'User deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to delete user' });
+  }
 };
 
 export const getMe = async (req, res) => {
