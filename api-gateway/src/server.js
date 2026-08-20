@@ -76,7 +76,7 @@ app.get('/health', async (req, res) => {
   res.json({ status: 'gateway healthy', services });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`API Gateway running on port ${PORT}`);
   console.log(`  Auth Service:      ${AUTH_SERVICE_URL}`);
   console.log(`  Resource Service:  ${RESOURCE_SERVICE_URL}`);

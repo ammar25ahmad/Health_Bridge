@@ -19,6 +19,6 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ai-service healthy' });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`AI service running on port ${PORT}`);
 });

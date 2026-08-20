@@ -46,10 +46,10 @@ React (Bun/Vite/JSX) :5173
    |           |            |              |
 auth-service  resource-service  ai-service
 :5001         :5002            :5003
-                                      ↓
-                                  python-service (FastAPI) :8000
-                                      ↓
-                                  MongoDB (Docker) :27017
+   |           |            |       ↓
+   |           |            |  python-service (FastAPI) :8000
+   ↓           ↓
+MongoDB (Docker) :27017
 ```
 
 ## Tech Stack
@@ -81,7 +81,8 @@ Health_Bridge/
 │   │   ├── organization/  # Organization dashboard pages
 │   │   ├── api/           # API client modules
 │   │   ├── store/         # Auth state management
-│   │   └── hooks/         # Custom React hooks
+│   │   ├── hooks/         # Custom React hooks
+│   │   └── utils/         # Utility functions
 │   └── package.json
 ├── api-gateway/           # Express API gateway
 │   └── src/
@@ -91,14 +92,21 @@ Health_Bridge/
 │   └── src/
 ├── ai-service/            # AI service (RAG, Agent)
 │   └── src/
+│       ├── agent/         # Health Resource Agent
+│       ├── services/      # LLM & RAG services
+│       └── prompts/       # AI prompt templates
 ├── python-service/        # Python OOP analyzer
 │   └── app/
+│       ├── api/           # FastAPI routes
+│       ├── models/        # Data models
+│       └── utils/         # Utility functions
 ├── rag/                   # RAG knowledge base
 │   └── knowledge-base/
 ├── kubernetes/            # K8s manifests
 ├── terraform/             # IaC configuration
 ├── scripts/               # Setup & deploy scripts
 ├── docs/                  # Documentation
+├── demo-video/            # Demo video assets
 ├── docker-compose.yml
 └── .env.example
 ```
@@ -158,6 +166,7 @@ cd frontend && bun install && bun run dev
 | PYTHON_SERVICE_URL | Python service URL | http://localhost:8000 |
 | LLM_API_KEY | Google Gemini API key | (empty = fallback mode) |
 | VITE_API_URL | Frontend API URL | http://localhost:5000 |
+| FRONTEND_URL | Frontend URL (for CORS) | http://localhost:5173 |
 
 ## Demo Accounts
 
@@ -197,6 +206,17 @@ cd frontend && bun install && bun run dev
 ## API Documentation
 
 See [docs/api.md](docs/api.md) for complete API documentation.
+
+### Additional Documentation
+- [docs/architecture.md](docs/architecture.md) - System architecture details
+- [docs/database.md](docs/database.md) - Database schema and models
+- [docs/docker.md](docs/docker.md) - Docker deployment guide
+- [docs/kubernetes.md](docs/kubernetes.md) - Kubernetes deployment
+- [docs/terraform.md](docs/terraform.md) - Infrastructure as Code
+- [docs/python-service.md](docs/python-service.md) - Python service details
+- [docs/rag.md](docs/rag.md) - RAG system documentation
+- [docs/ai-architecture.md](docs/ai-architecture.md) - AI architecture overview
+- [docs/agent.md](docs/agent.md) - Health Resource Agent documentation
 
 ## Running Services
 

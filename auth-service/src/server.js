@@ -23,7 +23,7 @@ app.get('/health', (req, res) => {
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/healthbridge')
   .then(() => {
     console.log('Connected to MongoDB');
-    app.listen(PORT, () => console.log(`Auth service running on port ${PORT}`));
+    app.listen(PORT, '0.0.0.0', () => console.log(`Auth service running on port ${PORT}`));
   })
   .catch((err) => {
     console.error('MongoDB connection error:', err);
