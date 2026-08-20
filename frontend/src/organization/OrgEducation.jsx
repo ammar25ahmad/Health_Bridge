@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import api from '../api/axios'
+import { useAuth } from '../store/authStore'
 import Loading from '../components/Loading'
 
 export default function OrgEducation() {
+  const { user } = useAuth()
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -12,7 +14,8 @@ export default function OrgEducation() {
   const fetchArticles = async () => {
     try {
       const res = await api.get('/articles')
-      setArticles(res.data.data.articles || [])
+      const all = res.data.data.articles || []
+      setArticles(all.filter(a => a.createdBy === user?.id))
     } catch (err) {
       console.error(err)
     } finally {
@@ -20,7 +23,7 @@ export default function OrgEducation() {
     }
   }
 
-  useEffect(() => { fetchArticles() }, [])
+  useEffect(() => { fetchArticles() }, [user])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -75,17 +78,35 @@ export default function OrgEducation() {
             <tr>
               <th className="text-left px-4 py-3 font-medium text-slate-600">Title</th>
               <th className="text-left px-4 py-3 font-medium text-slate-600">Category</th>
+              <th className="text-left px-4 py-3 font-medium text-slate-600">Quality</th>
+              <th className="text-left px-4 py-3 font-medium text-slate-600">Keywords</th>
               <th className="text-left px-4 py-3 font-medium text-slate-600">Created</th>
             </tr>
           </thead>
           <tbody>
-            {articles.map((a) => (
-              <tr key={a._id} className="border-t border-slate-100">
-                <td className="px-4 py-3 text-slate-800">{a.title}</td>
-                <td className="px-4 py-3 text-slate-600">{a.category}</td>
-                <td className="px-4 py-3 text-slate-500">{new Date(a.createdAt).toLocaleDateString()}</td>
-              </tr>
-            ))}
+            {articles.map((a) => {
+              const quality = a.classification?.qualityScore
+              const keywords = a.classification?.keywords || []
+              const hasQuality = quality != null
+              const qualityColor = !hasQuality ? 'text-slate-400' : quality >= 0.7 ? 'text-green-600' : quality >= 0.4 ? 'text-amber-600' : 'text-red-600'
+              return (
+                <tr key={a._id} className="border-t border-slate-100">
+                  <td className="px-4 py-3 text-slate-800 font-medium">{a.title}</td>
+                  <td className="px-4 py-3 text-slate-600">{a.category}</td>
+                  <td className="px-4 py-3">
+                    <span className={`font-bold text-sm ${qualityColor}`}>{hasQuality ? `${(quality * 100).toFixed(0)}%` : '—'}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-1">
+                      {keywords.slice(0, 3).map((kw, i) => (
+                        <span key={i} className="text-xs bg-cyan-100 text-cyan-700 px-1.5 py-0.5 rounded-full">{kw}</span>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-slate-500 text-xs">{new Date(a.createdAt).toLocaleDateString()}</td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
         {articles.length === 0 && <p className="text-center py-8 text-slate-500 text-sm">No articles yet.</p>}

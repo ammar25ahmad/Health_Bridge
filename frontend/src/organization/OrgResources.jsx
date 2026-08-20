@@ -15,7 +15,7 @@ export default function OrgResources() {
     try {
       const res = await api.get('/resources')
       const all = res.data.data.resources || []
-      setResources(all.filter(r => r.createdBy === user?._id))
+      setResources(all.filter(r => r.createdBy === user?.id))
     } catch (err) {
       console.error(err)
     } finally {

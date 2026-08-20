@@ -3,7 +3,7 @@ import { authenticateUser, authorizeRoles } from '../middleware/auth.middleware.
 import {
   getResources, getResourceById, createResource, updateResource, deleteResource, updateResourceStatus,
   getArticles, getArticleById, createArticle, updateArticle, deleteArticle,
-  createQuestion, getQuestions, updateQuestion,
+  createQuestion, getQuestions, updateQuestion, classifyAllArticles,
 } from '../controllers/resource.controller.js';
 
 const router = Router();
@@ -24,5 +24,7 @@ router.delete('/articles/:id', authenticateUser, deleteArticle);
 router.post('/questions', authenticateUser, createQuestion);
 router.get('/questions', authenticateUser, getQuestions);
 router.patch('/questions/:id', authenticateUser, updateQuestion);
+
+router.post('/articles/classify-all', authenticateUser, authorizeRoles('ADMIN'), classifyAllArticles);
 
 export default router;

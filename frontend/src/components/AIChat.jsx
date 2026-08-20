@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useAI } from '../hooks/useAI'
+import { renderMarkdown } from '../utils/renderMarkdown'
 
 export default function AIChat() {
   const [messages, setMessages] = useState([])
@@ -66,7 +67,7 @@ export default function AIChat() {
                   : 'bg-slate-100 text-slate-800'
               }`}
             >
-              <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+              <div className="text-sm">{renderMarkdown(msg.content)}</div>
               {msg.sources && msg.sources.length > 0 && (
                 <div className="mt-2 pt-2 border-t border-slate-200">
                   <p className="text-xs text-slate-500 font-medium">Sources:</p>

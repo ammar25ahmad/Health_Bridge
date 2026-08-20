@@ -10,10 +10,17 @@ const articleSchema = new mongoose.Schema({
   summary: { type: String, trim: true },
   content: { type: String, required: true },
   author: { type: String, trim: true, default: 'HealthBridge' },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   status: {
     type: String,
     enum: ['DRAFT', 'PUBLISHED'],
     default: 'PUBLISHED',
+  },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  classification: {
+    category: String,
+    keywords: [String],
+    qualityScore: Number,
   },
 }, { timestamps: true });
 

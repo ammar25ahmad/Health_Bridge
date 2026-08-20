@@ -6,6 +6,7 @@ import Loading from '../components/Loading'
 export default function ResourceDetails() {
   const { id } = useParams()
   const [resource, setResource] = useState(null)
+  const [relevance, setRelevance] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -13,6 +14,7 @@ export default function ResourceDetails() {
       try {
         const res = await resourceApi.getResource(id)
         setResource(res.data.data.resource)
+        setRelevance(res.data.data.relevanceAnalysis || null)
       } catch (err) {
         console.error(err)
       } finally {
@@ -98,6 +100,41 @@ export default function ResourceDetails() {
                   <p className="text-slate-700">{(resource.analysis.relevanceScore * 100).toFixed(0)}%</p>
                 </div>
               </div>
+
+              {relevance && (
+                <div className="mt-4 pt-3 border-t border-cyan-200">
+                  <h4 className="text-sm font-semibold text-cyan-700 mb-2">Content Quality Breakdown</h4>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-white rounded-lg p-3">
+                      <p className="text-xs text-slate-500">Relevance Score</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex-1 bg-slate-200 rounded-full h-2">
+                          <div className="bg-cyan-500 h-2 rounded-full" style={{ width: `${(relevance.relevanceScore * 100).toFixed(0)}%` }} />
+                        </div>
+                        <span className="text-sm font-bold text-slate-700">{(relevance.relevanceScore * 100).toFixed(0)}%</span>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-3">
+                      <p className="text-xs text-slate-500">Quality Score</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex-1 bg-slate-200 rounded-full h-2">
+                          <div className="bg-green-500 h-2 rounded-full" style={{ width: `${(relevance.qualityScore * 100).toFixed(0)}%` }} />
+                        </div>
+                        <span className="text-sm font-bold text-slate-700">{(relevance.qualityScore * 100).toFixed(0)}%</span>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-3">
+                      <p className="text-xs text-slate-500">Weighted Score</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex-1 bg-slate-200 rounded-full h-2">
+                          <div className="bg-amber-500 h-2 rounded-full" style={{ width: `${(relevance.weightedScore * 100).toFixed(0)}%` }} />
+                        </div>
+                        <span className="text-sm font-bold text-slate-700">{(relevance.weightedScore * 100).toFixed(0)}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

@@ -1,30 +1,14 @@
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../store/authStore'
 import { useResources, useArticles } from '../hooks/useResources'
 
 export default function Dashboard() {
   const { user } = useAuth()
 
-  if (user?.role === 'ORGANIZATION') return <OrgDashboardRedirect />
-  if (user?.role === 'ADMIN') return <AdminDashboardRedirect />
+  if (user?.role === 'ORGANIZATION') return <Navigate to="/organization/dashboard" replace />
+  if (user?.role === 'ADMIN') return <Navigate to="/admin/dashboard" replace />
 
   return <CitizenDashboard />
-}
-
-function OrgDashboardRedirect() {
-  return <Link to="/organization/dashboard" className="block">
-    <div className="min-h-[80vh] flex items-center justify-center">
-      <p className="text-slate-600">Redirecting to organization dashboard...</p>
-    </div>
-  </Link>
-}
-
-function AdminDashboardRedirect() {
-  return <Link to="/admin/dashboard" className="block">
-    <div className="min-h-[80vh] flex items-center justify-center">
-      <p className="text-slate-600">Redirecting to admin dashboard...</p>
-    </div>
-  </Link>
 }
 
 function CitizenDashboard() {

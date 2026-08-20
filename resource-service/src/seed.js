@@ -96,6 +96,7 @@ Where to Get Vaccinated:
 Visit your local vaccination center, community clinic, or pharmacy. Many vaccines are available at no cost through public health programs.`,
     author: 'HealthBridge Medical Team',
     status: 'PUBLISHED',
+    classification: { category: 'Vaccination', keywords: ['vaccine', 'vaccination', 'immune system', 'immunization', 'flu', 'booster', 'disease', 'infection', 'community immunity', 'pathogens'], qualityScore: 0.75 },
   },
   {
     title: 'Healthy Nutrition Habits for Everyone',
@@ -126,6 +127,7 @@ Practical Tips:
 Remember: Healthy eating is about balance and moderation, not strict restrictions.`,
     author: 'HealthBridge Nutrition Team',
     status: 'PUBLISHED',
+    classification: { category: 'Nutrition', keywords: ['nutrition', 'diet', 'food', 'protein', 'fiber', 'vitamin', 'calories', 'meal', 'eating', 'healthy'], qualityScore: 0.85 },
   },
   {
     title: 'The Importance of Hand Hygiene',
@@ -155,6 +157,7 @@ Why It Matters:
 Germs can spread through hand contact with contaminated surfaces. Clean hands protect you and those around you from illness.`,
     author: 'HealthBridge Hygiene Team',
     status: 'PUBLISHED',
+    classification: { category: 'Hygiene', keywords: ['hygiene', 'hand washing', 'clean', 'soap', 'germs', 'bacteria', 'infection', 'sanitizer', 'health', 'cleanliness'], qualityScore: 0.8 },
   },
   {
     title: 'First Aid Basics Everyone Should Know',
@@ -195,6 +198,7 @@ When to Call Emergency Services:
 Important: First aid is temporary care. Always seek professional medical help for serious injuries.`,
     author: 'HealthBridge First Aid Team',
     status: 'PUBLISHED',
+    classification: { category: 'First Aid', keywords: ['first aid', 'emergency', 'wound', 'burn', 'choking', 'bleeding', 'CPR', 'allergic', 'treatment', 'safety'], qualityScore: 0.8 },
   },
   {
     title: 'Preventive Healthcare: Staying Ahead of Illness',
@@ -233,6 +237,7 @@ Preventive Health Habits:
 - Manage stress through healthy activities`,
     author: 'HealthBridge Preventive Care Team',
     status: 'PUBLISHED',
+    classification: { category: 'Preventive Care', keywords: ['preventive', 'screening', 'checkup', 'early detection', 'vaccination', 'health', 'disease', 'wellness', 'exercise', 'lifestyle'], qualityScore: 0.85 },
   },
   {
     title: 'Building a Healthy Lifestyle',
@@ -273,6 +278,7 @@ Avoiding Harmful Habits:
 Building a healthy lifestyle takes time. Start with small changes and gradually build new habits. Every positive choice contributes to your overall well-being.`,
     author: 'HealthBridge Wellness Team',
     status: 'PUBLISHED',
+    classification: { category: 'Healthy Lifestyle', keywords: ['exercise', 'sleep', 'stress', 'wellness', 'fitness', 'mindfulness', 'physical activity', 'mental health', 'habits', 'relaxation'], qualityScore: 0.85 },
   },
 ];
 
@@ -306,7 +312,10 @@ async function seed() {
 
     const articles = [];
     for (const articleData of seedArticles) {
-      const article = await Article.create(articleData);
+      const article = await Article.create({
+        ...articleData,
+        createdBy: orgUser._id,
+      });
       articles.push(article);
     }
     console.log(`Seeded ${articles.length} articles`);

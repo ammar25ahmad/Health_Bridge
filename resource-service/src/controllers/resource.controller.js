@@ -18,13 +18,39 @@ const analyzeWithPython = async (resourceData) => {
   }
 };
 
+const classifyContentWithPython = async (text) => {
+  try {
+    const response = await axios.post(`${PYTHON_SERVICE_URL}/classify-content`, {
+      text,
+    }, { timeout: 5000 });
+    return response.data;
+  } catch (error) {
+    return { category: 'General Health', keywords: [], qualityScore: 0.5 };
+  }
+};
+
+const calculateRelevanceWithPython = async (text) => {
+  try {
+    const response = await axios.post(`${PYTHON_SERVICE_URL}/calculate-relevance`, {
+      text,
+    }, { timeout: 5000 });
+    return response.data;
+  } catch (error) {
+    return { relevanceScore: 0.5, qualityScore: 0.5, weightedScore: 0.5 };
+  }
+};
+
 export const getResources = async (req, res) => {
   try {
     const { search, category, location, availability, status, limit = 50 } = req.query;
     const query = {};
 
     if (search) {
-      query.$or = [{ name: { $regex: search, $options: 'i' } }, { description: { $regex: search, $options: 'i' } }];
+      const words = search.split(/\s+/).filter(w => w.length > 1);
+      query.$or = words.flatMap(word => [
+        { name: { $regex: word, $options: 'i' } },
+        { description: { $regex: word, $options: 'i' } },
+      ]);
     }
     if (category) query.category = category;
     if (location) query.location = { $regex: location, $options: 'i' };
@@ -44,7 +70,15 @@ export const getResourceById = async (req, res) => {
     if (!resource) {
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
-    res.json({ success: true, data: { resource } });
+
+    let relevanceAnalysis = null;
+    try {
+      relevanceAnalysis = await calculateRelevanceWithPython(
+        `${resource.name}. ${resource.description}. ${resource.category}`
+      );
+    } catch (err) {}
+
+    res.json({ success: true, data: { resource, relevanceAnalysis } });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to fetch resource' });
   }
@@ -80,7 +114,7 @@ export const updateResource = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
-    if (resource.createdBy.toString() !== req.user.id && req.user.role !== 'ADMIN') {
+    if (resource.createdBy.toString() !== req.user.id.toString() && req.user.role !== 'ADMIN') {
       return res.status(403).json({ success: false, message: 'Not authorized to update this resource' });
     }
 
@@ -98,7 +132,7 @@ export const deleteResource = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
-    if (resource.createdBy.toString() !== req.user.id && req.user.role !== 'ADMIN') {
+    if (resource.createdBy.toString() !== req.user.id.toString() && req.user.role !== 'ADMIN') {
       return res.status(403).json({ success: false, message: 'Not authorized to delete this resource' });
     }
 
@@ -160,7 +194,21 @@ export const createArticle = async (req, res) => {
     if (!title || !category || !content) {
       return res.status(400).json({ success: false, message: 'Title, category, and content are required' });
     }
-    const article = await Article.create({ title, category, summary, content });
+
+    const classification = await classifyContentWithPython(content);
+
+    const article = await Article.create({
+      title,
+      category,
+      summary,
+      content,
+      createdBy: req.user.id,
+      classification: {
+        category: classification.category,
+        keywords: classification.keywords,
+        qualityScore: classification.qualityScore,
+      },
+    });
     res.status(201).json({ success: true, data: { article } });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to create article' });
@@ -222,5 +270,34 @@ export const updateQuestion = async (req, res) => {
     res.json({ success: true, data: { question } });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to update question' });
+  }
+};
+
+export const classifyAllArticles = async (req, res) => {
+  try {
+    const articles = await Article.find({ $or: [{ classification: { $exists: false } }, { classification: null }] });
+    if (articles.length === 0) {
+      return res.json({ success: true, data: { classified: 0, message: 'All articles already classified' } });
+    }
+
+    let classified = 0;
+    for (const article of articles) {
+      try {
+        const classification = await classifyContentWithPython(article.content);
+        article.classification = {
+          category: classification.category,
+          keywords: classification.keywords,
+          qualityScore: classification.qualityScore,
+        };
+        await article.save();
+        classified++;
+      } catch (err) {
+        console.error(`Failed to classify article ${article._id}:`, err.message);
+      }
+    }
+
+    res.json({ success: true, data: { classified, total: articles.length } });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to classify articles' });
   }
 };

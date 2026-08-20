@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useAI } from '../hooks/useAI'
+import { renderMarkdown } from '../utils/renderMarkdown'
 
 export default function AgentPanel() {
   const [messages, setMessages] = useState([])
@@ -73,7 +74,7 @@ export default function AgentPanel() {
                     : 'bg-slate-100 text-slate-800'
                 }`}
               >
-                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                <div className="text-sm">{renderMarkdown(msg.content)}</div>
               </div>
 
               {msg.resources && msg.resources.length > 0 && (

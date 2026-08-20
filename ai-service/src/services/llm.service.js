@@ -2,17 +2,20 @@ import { HEALTH_SYSTEM_PROMPT, RAG_SYSTEM_PROMPT } from '../prompts/healthPrompt
 import { retrieveRelevantChunks } from './rag.service.js';
 
 const LLM_API_KEY = process.env.LLM_API_KEY || '';
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
-async function callGemini(systemPrompt, userMessage) {
+export async function callGemini(systemPrompt, userMessage) {
   if (!LLM_API_KEY) {
     return generateFallbackResponse(userMessage, systemPrompt === RAG_SYSTEM_PROMPT);
   }
 
   try {
-    const response = await fetch(`${GEMINI_URL}?key=${LLM_API_KEY}`, {
+    const response = await fetch(GEMINI_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': LLM_API_KEY,
+      },
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: systemPrompt }] },
         contents: [{ parts: [{ text: userMessage }] }],
@@ -63,7 +66,27 @@ function generateFallbackResponse(message, useRag = false) {
     return `**First Aid Basics**\n\nEssential first aid knowledge:\n\n- For minor cuts: Clean with water, apply ointment, bandage\n- For burns: Cool under running water for 10-20 minutes, don't apply ice\n- For choking: Perform abdominal thrusts (Heimlich maneuver)\n- For severe bleeding: Apply firm, direct pressure\n\nAlways seek professional medical help for serious injuries.\n\nHealthBridge provides general educational information and is not a medical diagnosis or a substitute for professional medical advice.`;
   }
 
-  return `I can help you learn about health topics. Here are some things I can explain:\n\n- Vaccination basics\n- Healthy nutrition habits\n- Hand hygiene importance\n- First aid principles\n- Preventive healthcare\n- Healthy lifestyle tips\n\nPlease ask a specific health education question, and I'll provide general educational information.\n\nHealthBridge provides general educational information and is not a medical diagnosis or a substitute for professional medical advice.`;
+  if (lower.includes('mental') || lower.includes('stress') || lower.includes('anxiety') || lower.includes('depression')) {
+    return `**Mental Health & Stress Management**\n\nMental health is just as important as physical health. Here are some helpful strategies:\n\n1. **Stay connected**: Maintain relationships with friends and family\n2. **Exercise regularly**: Physical activity helps reduce stress and anxiety\n3. **Practice mindfulness**: Meditation and deep breathing can calm the mind\n4. **Get enough sleep**: Aim for 7-9 hours per night\n5. **Set boundaries**: Learn to say no to avoid burnout\n6. **Seek help**: Talk to a mental health professional if needed\n\nMany communities offer free or low-cost mental health services. Don't hesitate to reach out.\n\nHealthBridge provides general educational information and is not a medical diagnosis or a substitute for professional medical advice.`;
+  }
+
+  if (lower.includes('exercise') || lower.includes('fitness') || lower.includes('workout') || lower.includes('physical activity')) {
+    return `**Exercise & Physical Activity Guidelines**\n\nRegular physical activity is one of the best things you can do for your health:\n\n- **Adults**: At least 150 minutes of moderate activity per week (e.g., brisk walking)\n- **Or**: 75 minutes of vigorous activity per week (e.g., running)\n- **Plus**: Strength training 2+ days per week\n\nBenefits of regular exercise:\n- Reduces risk of heart disease, diabetes, and some cancers\n- Improves mood and mental health\n- Helps maintain a healthy weight\n- Strengthens bones and muscles\n- Improves sleep quality\n\nStart slow and gradually increase intensity. Any movement is better than none!\n\nHealthBridge provides general educational information and is not a medical diagnosis or a substitute for professional medical advice.`;
+  }
+
+  if (lower.includes('sleep') || lower.includes('insomnia') || lower.includes('tired') || lower.includes('fatigue')) {
+    return `**Healthy Sleep Habits**\n\nQuality sleep is essential for physical and mental health:\n\n- **Adults need 7-9 hours** of sleep per night\n- **Keep a consistent schedule**: Go to bed and wake up at the same time daily\n- **Create a good environment**: Dark, cool, and quiet room\n- **Limit screens**: Avoid phones/computers 1 hour before bed\n- **Avoid caffeine**: After 2 PM if possible\n- **Exercise earlier**: But not close to bedtime\n\nIf you consistently struggle with sleep, consider consulting a healthcare professional.\n\nHealthBridge provides general educational information and is not a medical diagnosis or a substitute for professional medical advice.`;
+  }
+
+  if (lower.includes('pregnant') || lower.includes('pregnancy') || lower.includes('prenatal') || lower.includes('maternal')) {
+    return `**Prenatal Health Information**\n\nHealthy pregnancy practices for expecting mothers:\n\n- **Prenatal care**: Start regular checkups early\n- **Folic acid**: Take 400-800mcg daily, especially in the first trimester\n- **Nutrition**: Eat a balanced diet rich in iron, calcium, and protein\n- **Stay active**: Safe exercises include walking and prenatal yoga\n- **Avoid**: Alcohol, tobacco, and excessive caffeine\n- **Rest**: Get adequate sleep and manage stress\n\nAlways consult your obstetrician or midwife for personalized prenatal advice.\n\nHealthBridge provides general educational information and is not a medical diagnosis or a substitute for professional medical advice.`;
+  }
+
+  if (lower.includes('diabetes') || lower.includes('sugar') || lower.includes('glucose')) {
+    return `**Understanding Diabetes Prevention**\n\nDiabetes is a condition that affects how your body processes blood sugar. Here are key prevention strategies:\n\n1. **Maintain a healthy weight**: Being overweight increases risk\n2. **Eat balanced meals**: Focus on whole grains, vegetables, and lean proteins\n3. **Exercise regularly**: At least 150 minutes per week\n4. **Monitor blood sugar**: Especially if you have risk factors\n5. **Limit sugary drinks**: Water is always the best choice\n6. **Get regular checkups**: Early detection is key\n\nRisk factors include family history, age, and lifestyle. Talk to your doctor about screening.\n\nHealthBridge provides general educational information and is not a medical diagnosis or a substitute for professional medical advice.`;
+  }
+
+  return `I can help you learn about health topics. Here are some things I can explain:\n\n- Vaccination basics\n- Healthy nutrition habits\n- Hand hygiene and cleanliness\n- First aid principles\n- Preventive healthcare\n- Mental health and stress management\n- Exercise and fitness guidelines\n- Sleep hygiene\n- Diabetes prevention\n- Maternal health\n\nPlease ask a specific health education question, and I'll provide general educational information.\n\nHealthBridge provides general educational information and is not a medical diagnosis or a substitute for professional medical advice.`;
 }
 
 export async function chatWithLLM(message) {

@@ -14,7 +14,7 @@ export default function OrgDashboard() {
       try {
         const res = await api.get('/resources')
         const resources = res.data.data.resources || []
-        const myResources = resources.filter(r => r.createdBy === user?._id)
+        const myResources = resources.filter(r => r.createdBy === user?.id)
         setStats({
           total: myResources.length,
           active: myResources.filter(r => r.status === 'ACTIVE' || r.status === 'APPROVED').length,
