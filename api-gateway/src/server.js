@@ -9,12 +9,12 @@ import axios from 'axios';
 const app = express();
 const PORT = process.env.GATEWAY_PORT || 5000;
 
-const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:5001';
-const RESOURCE_SERVICE_URL = process.env.RESOURCE_SERVICE_URL || 'http://localhost:5002';
-const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:5003';
+const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'https://healthbridge-auth.onrender.com';
+const RESOURCE_SERVICE_URL = process.env.RESOURCE_SERVICE_URL || 'https://healthbridge-resource.onrender.com';
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'https://healthbridge-ai-zei1.onrender.com';
 
 app.use(helmet());
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173', credentials: true }));
+app.use(cors({ origin: process.env.FRONTEND_URL || 'https://healthbridge-frontend-dacf.onrender.com/', credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
