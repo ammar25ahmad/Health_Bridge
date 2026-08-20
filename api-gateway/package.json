@@ -1,0 +1,17 @@
+{
+  "name": "healthbridge-api-gateway",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "axios": "^1.19.0",
+    "express-rate-limit": "^7.5.0"
+  }
+}
