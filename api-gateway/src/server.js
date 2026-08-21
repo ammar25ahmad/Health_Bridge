@@ -8,6 +8,7 @@ import axios from 'axios';
 import './keepAlive.js';
 
 const app = express();
+app.set("trust proxy", 1);
 const PORT = process.env.GATEWAY_PORT || 5000;
 
 const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'https://healthbridge-auth.onrender.com';
@@ -19,7 +20,6 @@ app.use(cors({ origin: process.env.FRONTEND_URL || 'https://healthbridge-fronten
 app.use(express.json());
 app.use(cookieParser());
 
-app.set("trust proxy", 1);
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 200,
