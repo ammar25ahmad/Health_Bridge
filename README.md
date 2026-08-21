@@ -167,6 +167,22 @@ cd frontend && bun install && bun run dev
 | LLM_API_KEY | Google Gemini API key | (empty = fallback mode) |
 | VITE_API_URL | Frontend API URL | http://localhost:5000 |
 | FRONTEND_URL | Frontend URL (for CORS) | http://localhost:5173 |
+| NODE_ENV | Environment mode (`production` enables `SameSite=None; Secure` auth cookies) | development |
+
+## Production Deployment (Render)
+
+The frontend and API gateway run on **different domains**, so cross-origin cookies and CORS must be configured exactly as below. Set these in each Render service's Environment settings:
+
+| Service | Variable | Value |
+|---------|----------|-------|
+| api-gateway, auth-service, resource-service, ai-service | `NODE_ENV` | `production` |
+| api-gateway, auth-service, resource-service, ai-service | `FRONTEND_URL` | `https://healthbridge-frontend-dacf.onrender.com` |
+| frontend | `VITE_API_URL` | `https://healthbridge-gateway.onrender.com` |
+
+Notes:
+- `FRONTEND_URL` accepts a comma-separated list of allowed origins.
+- `VITE_API_URL` is baked into the bundle at build time — after changing it, trigger a manual redeploy of the frontend.
+- Auth cookies are issued with `SameSite=None; Secure` in production, which requires HTTPS (Render provides this by default).
 
 ## Demo Accounts
 

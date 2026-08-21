@@ -15,8 +15,21 @@ const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'https://healthbridge-a
 const RESOURCE_SERVICE_URL = process.env.RESOURCE_SERVICE_URL || 'https://healthbridge-resource.onrender.com';
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'https://healthbridge-ai-zei1.onrender.com';
 
+const allowedOrigins = (process.env.FRONTEND_URL || 'https://healthbridge-frontend-dacf.onrender.com')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(null, false);
+  },
+  credentials: true,
+};
+
 app.use(helmet());
-app.use(cors({ origin: process.env.FRONTEND_URL || 'https://healthbridge-frontend-dacf.onrender.com' || 'http://healthbridge-frontend-dacf:1000', credentials: true }));
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 

@@ -5,13 +5,17 @@ const generateToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
+const isProd = process.env.NODE_ENV === 'production';
+
+const cookieOptions = () => ({
+  httpOnly: true,
+  secure: isProd,
+  sameSite: isProd ? 'none' : 'lax',
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
+
 const setTokenCookie = (res, token) => {
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+  res.cookie('token', token, cookieOptions());
 };
 
 export const register = async (req, res) => {
@@ -86,7 +90,7 @@ export const login = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-  res.cookie('token', '', { httpOnly: true, expires: new Date(0) });
+  res.cookie('token', '', { ...cookieOptions(), maxAge: 0 });
   res.json({ success: true, message: 'Logged out' });
 };
 
