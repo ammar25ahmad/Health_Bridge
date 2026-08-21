@@ -15,7 +15,7 @@ const RESOURCE_SERVICE_URL = process.env.RESOURCE_SERVICE_URL || 'https://health
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'https://healthbridge-ai-zei1.onrender.com';
 
 app.use(helmet());
-app.use(cors({ origin: process.env.FRONTEND_URL || 'https://healthbridge-frontend-dacf.onrender.com', credentials: true }));
+app.use(cors({ origin: process.env.FRONTEND_URL || 'https://healthbridge-frontend-dacf.onrender.com' || 'http://healthbridge-frontend-dacf:1000', credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
