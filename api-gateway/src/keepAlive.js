@@ -2,6 +2,7 @@ import cron from 'node-cron';
 import axios from 'axios';
 
 const services = [
+  { name: 'api-gateway', url: process.env.SERVICE_URL || 'https://healthbridge-gateway.onrender.com' },
   { name: 'auth-service', url: process.env.AUTH_SERVICE_URL || 'https://healthbridge-auth.onrender.com' },
   { name: 'resource-service', url: process.env.RESOURCE_SERVICE_URL || 'https://healthbridge-resource.onrender.com' },
   { name: 'ai-service', url: process.env.AI_SERVICE_URL || 'https://healthbridge-ai-zei1.onrender.com' },
@@ -18,4 +19,4 @@ cron.schedule('*/5 * * * *', async () => {
   }
 });
 
-console.log('[Keep-Alive] Pinging auth, resource, ai services every 5 minutes');
+console.log('[Keep-Alive] Pinging api-gateway, auth, resource, ai services every 5 minutes');
