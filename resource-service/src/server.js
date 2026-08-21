@@ -5,7 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import resourceRoutes from './routes/resource.routes.js';
-import './keepAlive.js';
+
 
 const app = express();
 const PORT = process.env.PORT || 5002;

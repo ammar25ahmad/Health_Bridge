@@ -1,15 +1,21 @@
 import cron from 'node-cron';
 import axios from 'axios';
 
-const SERVICE_URL = process.env.SERVICE_URL || `http://localhost:${process.env.GATEWAY_PORT || 5000}`;
+const services = [
+  { name: 'auth-service', url: process.env.AUTH_SERVICE_URL || 'https://healthbridge-auth.onrender.com' },
+  { name: 'resource-service', url: process.env.RESOURCE_SERVICE_URL || 'https://healthbridge-resource.onrender.com' },
+  { name: 'ai-service', url: process.env.AI_SERVICE_URL || 'https://healthbridge-ai-zei1.onrender.com' },
+];
 
 cron.schedule('*/5 * * * *', async () => {
-  try {
-    await axios.get(`${SERVICE_URL}/health`);
-    console.log('[Keep-Alive] api-gateway ping successful');
-  } catch (error) {
-    console.error('[Keep-Alive] api-gateway ping failed:', error.message);
+  for (const service of services) {
+    try {
+      await axios.get(`${service.url}/health`, { timeout: 10000 });
+      console.log(`[Keep-Alive] ${service.name} ping successful`);
+    } catch (error) {
+      console.error(`[Keep-Alive] ${service.name} ping failed:`, error.message);
+    }
   }
 });
 
-console.log('[Keep-Alive] api-gateway scheduled every 5 minutes');
+console.log('[Keep-Alive] Pinging auth, resource, ai services every 5 minutes');
