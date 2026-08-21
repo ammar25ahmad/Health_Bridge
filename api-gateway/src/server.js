@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import axios from 'axios';
+import './keepAlive.js';
 
 const app = express();
 const PORT = process.env.GATEWAY_PORT || 5000;
